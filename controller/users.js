@@ -1,5 +1,8 @@
 const { User } = require("../service/schemas/user.js");
 const service = require("../service/users.js");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const secret = process.env.SECRET;
 
 const getAll = async (req, res, next) => {
   try {
@@ -13,13 +16,13 @@ const getAll = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await service.getUserByEmail({ email });
+  const user = await service.getUser({ email });
 
   if (user) return res.status(409).json({ message: "Email in use" });
 
   try {
-      const newUser = new User({ email });
-    newUser.setPassword(password);
+    const newUser = new User({ email, password });
+    // newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
       user: {
@@ -32,4 +35,34 @@ const register = async (req, res, next) => {
   }
 };
 
-module.exports = { register, getAll };
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await service.getUser({ email });
+
+    if (!user || user.password !== password)
+      return res.status(401).json({ message: "Email or password is wrong" });
+
+    const payload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const token = jwt.sign(payload, secret, { expiresIn: "1h" });
+    await service.updateUser(user.id, { token });
+    res
+      .status(200)
+      .json({ token, user: { email, subscription: user.subscription } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const logout = async (req, res, next) => {
+  const user = await service.getUser({ _id: req.user._id });
+  if (!user) return res.status(401).json({ message: "Not authorized" });
+  await service.updateUser(user.id, { token: null });
+  res.sendStatus(204);
+};
+
+module.exports = { register, getAll, login, logout };

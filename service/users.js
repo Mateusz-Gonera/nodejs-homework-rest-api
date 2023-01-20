@@ -1,7 +1,9 @@
 const { User } = require("./schemas/user.js");
 
-const getUser = async (id) => User.findById(id);
+const getUserById = async (id) => User.findById(id);
 
-const getUserByEmail = async (email) => User.findOne(email);
+const getUser = async (body) => User.findOne(body);
 
-module.exports = { getUser, getUserByEmail };
+const updateUser = async (id, body) => User.findByIdAndUpdate(id, body);
+
+module.exports = { getUser, getUserById, updateUser };
