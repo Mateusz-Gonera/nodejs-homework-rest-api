@@ -14,6 +14,8 @@ router.get("/logout", auth, userController.logout);
 
 router.get("/current", auth, userController.current);
 
+router.patch("/", auth, userController.updateSub);
+
 router.get("/", userController.getAll);
 
 module.exports = router;

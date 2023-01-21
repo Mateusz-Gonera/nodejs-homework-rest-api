@@ -71,14 +71,28 @@ const logout = async (req, res, next) => {
 
 const current = async (req, res, next) => {
   try {
-    const user = service.getUser({ token: req.user.token });
+    const user = await service.getUser({ token: req.user.token });
     if (!user) return res.status(401).json({ message: "Not authorized" });
     res
       .status(200)
-      .json({ email: req.user.email, subscription: req.user.subscription });
+      .json({ email: user.email, subscription: user.subscription });
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { register, getAll, login, logout, current };
+const updateSub = async (req, res, next) => {
+  try {
+    const { subscription } = req.body;
+    const user = await service.getUser({ token: req.user.token });
+    if (!user) return res.status(401).json({ message: "Not authorized" });
+    const newUser = await service.updateUser(user.id, { subscription });
+    res
+      .status(200)
+      .json({ email: newUser.email, subscription: newUser.subscription });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, getAll, login, logout, current, updateSub };
