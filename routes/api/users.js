@@ -12,6 +12,8 @@ router.post("/login", validateData(userValidate), userController.login);
 
 router.get("/logout", auth, userController.logout);
 
+router.get("/current", auth, userController.current);
+
 router.get("/", userController.getAll);
 
 module.exports = router;

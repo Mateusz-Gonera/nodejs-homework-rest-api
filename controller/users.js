@@ -59,10 +59,26 @@ const login = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
-  const user = await service.getUser({ _id: req.user._id });
-  if (!user) return res.status(401).json({ message: "Not authorized" });
-  await service.updateUser(user.id, { token: null });
-  res.sendStatus(204);
+  try {
+    const user = await service.getUser({ _id: req.user._id });
+    if (!user) return res.status(401).json({ message: "Not authorized" });
+    await service.updateUser(user.id, { token: null });
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports = { register, getAll, login, logout };
+const current = async (req, res, next) => {
+  try {
+    const user = service.getUser({ token: req.user.token });
+    if (!user) return res.status(401).json({ message: "Not authorized" });
+    res
+      .status(200)
+      .json({ email: req.user.email, subscription: req.user.subscription });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, getAll, login, logout, current };
