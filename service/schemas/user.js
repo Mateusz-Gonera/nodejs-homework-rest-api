@@ -1,5 +1,6 @@
 const { model, Schema } = require("mongoose");
 const bCrypt = require("bcryptjs");
+const passportLocal = require("passport-local-mongoose");
 
 const userSchema = new Schema({
   password: {
@@ -21,6 +22,8 @@ const userSchema = new Schema({
     default: null,
   },
 });
+
+userSchema.plugin(passportLocal);
 
 const User = model("user", userSchema);
 
