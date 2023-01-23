@@ -21,8 +21,8 @@ const register = async (req, res, next) => {
   if (user) return res.status(409).json({ message: "Email in use" });
 
   try {
-    const newUser = new User({ email, password });
-    await newUser.setPassword(password);
+    const newUser = new User({ email });
+    newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
       user: {
@@ -40,7 +40,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await service.getUser({ email });
 
-    if (!user || user.password !== password)
+    if (!user || !user.validPassword(password))
       return res.status(401).json({ message: "Email or password is wrong" });
 
     const payload = {
