@@ -8,6 +8,9 @@ const getAll = async (req, res, next) => {
     if (req.query.favorite === "true") {
       results = await service.getAll({ favorite: req.query.favorite });
     }
+    if (req.query.favorite === "false") {
+      results = await service.getAll({ favorite: false });
+    }
     if (req.query.page && req.query.limit) {
       results = await paginate(Contact, req.query.page, req.query.limit);
     }
