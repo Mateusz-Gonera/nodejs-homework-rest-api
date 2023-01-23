@@ -1,8 +1,12 @@
 const service = require("../service/contacts.js");
+const { paginate } = require("../utils/pagination.js");
 
 const getAll = async (req, res, next) => {
   try {
-    const results = await service.getAll();
+    let results = await service.getAll();
+    if (req.query.page && req.query.limit) {
+      results = await paginate(req.query.page, req.query.limit);
+    }
     res.status(200).json(results);
   } catch (err) {
     console.error(err.message);
