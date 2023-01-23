@@ -2,26 +2,29 @@ const { model, Schema } = require("mongoose");
 const bCrypt = require("bcryptjs");
 const passportLocal = require("passport-local-mongoose");
 
-const userSchema = new Schema({
-  password: {
-    type: String,
-    required: [true, "Password is required"],
+const userSchema = new Schema(
+  {
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+    },
+    subscription: {
+      type: String,
+      enum: ["starter", "pro", "business"],
+      default: "starter",
+    },
+    token: {
+      type: String,
+      default: null,
+    },
   },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-  },
-  subscription: {
-    type: String,
-    enum: ["starter", "pro", "business"],
-    default: "starter",
-  },
-  token: {
-    type: String,
-    default: null,
-  },
-});
+  { versionKey: false, timestamp: true }
+);
 
 userSchema.plugin(passportLocal);
 
