@@ -1,8 +1,19 @@
 const service = require("../service/contacts.js");
+const { paginate } = require("../utils/pagination.js");
+const { Contact } = require("../service/schemas/contact.js");
 
 const getAll = async (req, res, next) => {
   try {
-    const results = await service.getAll();
+    let results = await service.getAll({});
+    if (req.query.favorite === "true") {
+      results = await service.getAll({ favorite: req.query.favorite });
+    }
+    if (req.query.favorite === "false") {
+      results = await service.getAll({ favorite: false });
+    }
+    if (req.query.page && req.query.limit) {
+      results = await paginate(Contact, req.query.page, req.query.limit);
+    }
     res.status(200).json(results);
   } catch (err) {
     console.error(err.message);
@@ -30,12 +41,7 @@ const addContact = async (req, res, next) => {
     const result = await service.createContact(req.body);
     if (!result)
       return res.status(404).json({ message: "Something goes wrong" });
-    if (result)
-      return res.json({
-        status: "success",
-        code: 201,
-        data: { result },
-      });
+    if (result) return res.status(201).json(result);
   } catch (err) {
     console.error(err.message);
     next(err);
@@ -50,12 +56,7 @@ const updateContact = async (req, res, next) => {
       return res.status(400).json({ message: "missing fields" });
     const result = await service.update(contactId, req.body);
     if (!result) return res.status(404).json({ message: "Not found" });
-    if (result)
-      return res.json({
-        status: "success",
-        code: 200,
-        data: { result },
-      });
+    if (result) return res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
     next(err);
@@ -70,12 +71,7 @@ const updateStatus = async (req, res, next) => {
       return res.status(400).json({ message: "missing field favorite" });
     const result = await service.updateStatusContact(contactId, req.body);
     if (!result) return res.status(404).json({ message: "Not found" });
-    if (result)
-      return res.json({
-        status: "success",
-        code: 200,
-        data: { result },
-      });
+    if (result) return res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
     next(err);
