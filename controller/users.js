@@ -97,4 +97,12 @@ const updateSub = async (req, res, next) => {
   }
 };
 
-module.exports = { register, getAll, login, logout, current, updateSub };
+const updateAvatar = async (req, res, next) => {
+  try {
+    console.log(req.file);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, getAll, login, logout, current, updateSub, updateAvatar };
