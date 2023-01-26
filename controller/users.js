@@ -22,7 +22,7 @@ const register = async (req, res, next) => {
   if (user) return res.status(409).json({ message: "Email in use" });
 
   try {
-    const avatarURL = gravatar.url(email);
+    const avatarURL = gravatar.url(email, { s: "250", d: "mp" });
     const newUser = new User({ email, avatarURL });
     newUser.setPassword(password);
     await newUser.save();
