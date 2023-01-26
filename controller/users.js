@@ -1,6 +1,7 @@
 const { User } = require("../service/schemas/user.js");
 const service = require("../service/users.js");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 require("dotenv").config();
 const secret = process.env.SECRET;
 
@@ -21,7 +22,8 @@ const register = async (req, res, next) => {
   if (user) return res.status(409).json({ message: "Email in use" });
 
   try {
-    const newUser = new User({ email });
+    const avatarURL = gravatar.url(email);
+    const newUser = new User({ email, avatarURL });
     newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
