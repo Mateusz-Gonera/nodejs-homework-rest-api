@@ -4,7 +4,7 @@ const { validateData } = require("../../middlewares/validator.js");
 const { userValidate } = require("../../utils/validator.js");
 const { auth } = require("../../middlewares/authorizationJwt.js");
 const { upload } = require("../../middlewares/upload");
-const { editAvatar } = require("../../middlewares/editAvatar.js");
+
 
 const router = express.Router();
 
@@ -22,7 +22,6 @@ router.patch(
   "/avatars",
   auth,
   upload.single("avatar"),
-  editAvatar(),
   userController.updateAvatar
 );
 
