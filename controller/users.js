@@ -2,12 +2,16 @@ const { User } = require("../service/schemas/user.js");
 const service = require("../service/users.js");
 const { avatarDir } = require("../middlewares/upload.js");
 const { editAvatar } = require("../utils/editAvatar.js");
+const { PORT } = require("../server.js");
+const sgMail = require("@sendgrid/mail");
+const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 require("dotenv").config();
 const secret = process.env.SECRET;
+const sgToken = process.env.SG_API_KEY;
 
 const getAll = async (req, res, next) => {
   try {
@@ -24,8 +28,19 @@ const register = async (req, res, next) => {
   const user = await service.getUser({ email });
 
   if (user) return res.status(409).json({ message: "Email in use" });
+  sgMail.setApiKey(sgToken);
+  const vfToken = uuidv4();
+  const vfLink = `http://localhost:${PORT}/api/users/verify/${vfToken}`;
+  const msg = {
+    to: email,
+    from: "mlody13992@gmail.com",
+    subject: "Verification token",
+    text: `Your verification token: ${vfLink}`,
+    html: `<b>Your verification token: <a href="${vfLink}">${vfLink}</a></b>`,
+  };
 
   try {
+    await sgMail.send(msg);
     const avatarURL = gravatar.url(email, { s: "250", d: "mp" });
     const newUser = new User({ email, avatarURL });
     newUser.setPassword(password);
@@ -113,6 +128,21 @@ const updateAvatar = async (req, res, next) => {
     res.status(200).json({ avatarURL: newUser.avatarURL });
   } catch (err) {
     await fs.unlink(tmpPath);
+    next(err);
+  }
+};
+
+const verificationLink = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await service.getUser({ verificationToken });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    await service.updateUser(user.id, {
+      verificationToken: null,
+      verify: true,
+    });
+    res.status(200).json({ message: "Verification successful" });
+  } catch (err) {
     next(err);
   }
 };
