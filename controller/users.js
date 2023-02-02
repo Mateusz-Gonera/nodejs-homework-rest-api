@@ -36,8 +36,8 @@ const register = async (req, res, next) => {
     to: email,
     from: "mlody13992@gmail.com",
     subject: "Verification token",
-    text: `Your verification token: `,
-    html: `<b>Your verification token: `,
+    text: `Your verification token: ${vfLink}`,
+    html: `<b>Your verification token: <a href="${vfLink}">${vfLink}</a></b>`,
   };
 
   try {
