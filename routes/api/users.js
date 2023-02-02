@@ -5,7 +5,6 @@ const { userValidate } = require("../../utils/validator.js");
 const { auth } = require("../../middlewares/authorizationJwt.js");
 const { upload } = require("../../middlewares/upload");
 
-
 const router = express.Router();
 
 router.post("/signup", validateData(userValidate), userController.register);
@@ -24,6 +23,8 @@ router.patch(
   upload.single("avatar"),
   userController.updateAvatar
 );
+
+router.get("/verify/:verificationToken", userController.verificationLink);
 
 // router.get("/", userController.getAll);
 

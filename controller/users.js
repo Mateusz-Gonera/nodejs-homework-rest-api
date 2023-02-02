@@ -25,24 +25,25 @@ const getAll = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
+  sgMail.setApiKey(sgToken);
   const user = await service.getUser({ email });
 
   if (user) return res.status(409).json({ message: "Email in use" });
-  sgMail.setApiKey(sgToken);
+
   const vfToken = uuidv4();
   const vfLink = `http://localhost:${PORT}/api/users/verify/${vfToken}`;
   const msg = {
     to: email,
     from: "mlody13992@gmail.com",
     subject: "Verification token",
-    text: `Your verification token: ${vfLink}`,
-    html: `<b>Your verification token: <a href="${vfLink}">${vfLink}</a></b>`,
+    text: `Your verification token: `,
+    html: `<b>Your verification token: `,
   };
 
   try {
     await sgMail.send(msg);
     const avatarURL = gravatar.url(email, { s: "250", d: "mp" });
-    const newUser = new User({ email, avatarURL });
+    const newUser = new User({ email, avatarURL, verificationToken: vfToken });
     newUser.setPassword(password);
     await newUser.save();
     res.status(201).json({
@@ -155,4 +156,5 @@ module.exports = {
   current,
   updateSub,
   updateAvatar,
+  verificationLink,
 };
