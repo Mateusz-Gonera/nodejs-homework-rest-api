@@ -2,7 +2,6 @@ const { User } = require("../service/schemas/user.js");
 const service = require("../service/users.js");
 const { avatarDir } = require("../middlewares/upload.js");
 const { editAvatar } = require("../utils/editAvatar.js");
-const { PORT } = require("../server.js");
 const sgMail = require("@sendgrid/mail");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
@@ -31,7 +30,7 @@ const register = async (req, res, next) => {
   if (user) return res.status(409).json({ message: "Email in use" });
 
   const vfToken = uuidv4();
-  const vfLink = `http://localhost:${PORT}/api/users/verify/${vfToken}`;
+  const vfLink = `http://localhost:3000/api/users/verify/${vfToken}`;
   const msg = {
     to: email,
     from: "mlody13992@gmail.com",
@@ -138,10 +137,11 @@ const verificationLink = async (req, res, next) => {
     const { verificationToken } = req.params;
     const user = await service.getUser({ verificationToken });
     if (!user) return res.status(404).json({ message: "User not found" });
-    await service.updateUser(user.id, {
-      verificationToken: null,
-      verify: true,
-    });
+    await User.findByIdAndUpdate(
+      user.id,
+      { verify: true, verificationToken: null },
+      { new: true }
+    );
     res.status(200).json({ message: "Verification successful" });
   } catch (err) {
     next(err);
