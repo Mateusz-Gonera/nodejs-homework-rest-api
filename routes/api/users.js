@@ -32,6 +32,4 @@ router.post(
   userController.repeatVerification
 );
 
-// router.get("/", userController.getAll);
-
 module.exports = router;
