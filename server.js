@@ -19,7 +19,7 @@ connection
       await createFolderNotExisting(tmpDir);
       await createFolderNotExisting(avatarDir);
       console.log("\nDatabase connection successful.");
-      console.log(`Use our API on port: ${PORT}`);
+      console.log(`Use our API on port: ${PORT}\n`);
     });
   })
   .catch((err) => {
