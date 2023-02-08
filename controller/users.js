@@ -26,13 +26,13 @@ const register = async (req, res, next) => {
   const user = await service.getUser({ email });
 
   if (user) return res.status(409).json({ message: "Email in use" });
-  const vfToken = uuidv4();
+  const verificationToken = uuidv4();
   try {
     const avatarURL = gravatar.url(email, { s: "250", d: "mp" });
-    const newUser = new User({ email, avatarURL, verificationToken: vfToken });
+    const newUser = new User({ email, avatarURL, verificationToken });
     newUser.setPassword(password);
     await newUser.save();
-    await sendMail(email, vfToken);
+    await sendMail(email, verificationToken);
     res.status(201).json({
       user: {
         email,
