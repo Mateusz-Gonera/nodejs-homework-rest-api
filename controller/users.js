@@ -49,7 +49,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await service.getUser({ email });
 
-    if (!user || !user.validPassword(password))
+    if (!(user?.validPassword(password)))
       return res.status(401).json({ message: "Email or password is wrong" });
     if (!user.verify)
       return res.status(401).json({
